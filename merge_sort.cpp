@@ -160,3 +160,6 @@ void MergeSortPar::merge(std::vector<int>& arr, int left, int mid, int right) {
     while (i < n1) arr[k++] = L[i++];
     while (j < n2) arr[k++] = R[j++];
 }
+
+// implementasi MergeSortPar dan Bitonic dengan cut-off prefetch dan schedule policy
+
