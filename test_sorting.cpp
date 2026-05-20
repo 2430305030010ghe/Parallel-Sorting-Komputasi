@@ -530,3 +530,6 @@ int main() {
 
     return failed > 0 ? 1 : 0;
 }
+
+
+test: implementasi 43 unit test dan coverage report 100 persen dari 36 fungsi
