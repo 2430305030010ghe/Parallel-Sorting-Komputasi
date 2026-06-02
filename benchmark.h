@@ -69,3 +69,4 @@ private:
     double filterOutliers(std::vector<double>& times);
     bool validateSorted(const std::vector<int>& data);
 };
+
