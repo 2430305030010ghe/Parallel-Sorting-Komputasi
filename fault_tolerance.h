@@ -184,4 +184,3 @@ private:
     int interval_;
     int opCount_;
 };
-
