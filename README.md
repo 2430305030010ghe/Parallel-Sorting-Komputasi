@@ -72,24 +72,13 @@ pip install matplotlib pandas numpy
 ### Langkah 1 — Compile Benchmark
 
 ```bash
-g++ -O3 -std=c++17 -fopenmp \
-    src/main.cpp \
-    src/dataset_generator.cpp \
-    src/merge_sort.cpp \
-    src/bitonic_sort.cpp \
-    src/benchmark.cpp \
-    -o benchmark.exe
+g++ -O3 -std=c++17 -fopenmp src/main.cpp src/dataset_generator.cpp src/merge_sort.cpp src/bitonic_sort.cpp src/benchmark.cpp -o benchmark.exe
 ```
 
 ### Langkah 2 — Compile Unit Test
 
 ```bash
-g++ -O1 -std=c++17 -fopenmp \
-    src/test_sorting.cpp \
-    src/dataset_generator.cpp \
-    src/merge_sort.cpp \
-    src/bitonic_sort.cpp \
-    -o test_sorting.exe
+g++ -O1 -std=c++17 -fopenmp src/test_sorting.cpp src/dataset_generator.cpp src/merge_sort.cpp src/bitonic_sort.cpp -o test_sorting.exe
 ```
 
 ### Langkah 3 — Jalankan Unit Test (wajib sebelum benchmark)
