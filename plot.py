@@ -141,6 +141,13 @@ def plot_speedup(df, axes):
         ax.plot(all_threads, all_threads, "--", color="gray",
                 linewidth=1.5, alpha=0.6, label="Ideal (Linear)")
 
+        # Kurva Amdahl's Law (f=20.2% serial fraction dari data empiris)
+        f = 0.202
+        p_range = np.linspace(1, max(all_threads), 100)
+        amdahl  = [1 / (f + (1 - f) / p) for p in p_range]
+        ax.plot(p_range, amdahl, "r:", linewidth=2,
+                alpha=0.8, label=f"Amdahl (f=20.2%)")
+
         ax.set_title(f"Dataset: {ds_type.replace('_', ' ').title()}")
         ax.set_xlabel("Jumlah Thread")
         ax.set_ylabel("Speedup")
@@ -232,6 +239,85 @@ def plot_dataset_comparison(df, ax):
     ax.grid(axis="y", alpha=0.3)
     ax.set_ylim(bottom=0)
 
+
+# ─────────────────────────────────────────────────────────────
+# Grafik 5: Waktu vs Karakteristik Dataset (pengganti waktu vs ukuran)
+# Menunjukkan bagaimana karakteristik data mempengaruhi waktu eksekusi
+# ─────────────────────────────────────────────────────────────
+def plot_time_vs_dataset_char(df, ax):
+    """
+    Grafik Waktu Eksekusi vs Karakteristik Dataset
+    Menggantikan grafik waktu vs ukuran masalah karena semua dataset
+    menggunakan ukuran yang sama (1 juta elemen).
+    Menunjukkan pengaruh distribusi data terhadap performa algoritma.
+    """
+    # Urutan dari paling ringan ke paling berat berdasarkan waktu sequential (results.csv):
+    # reverse=96.8ms → nearly_sorted=101.1ms → duplicates=124.8ms → random=154.4ms
+    dataset_order  = ["reverse", "nearly_sorted", "duplicates", "random"]
+    dataset_labels = ["Reverse\n96.8ms\n(paling ringan)", 
+                      "Nearly Sorted\n101.1ms\n(ringan)", 
+                      "Duplicates\n124.8ms\n(sedang)",
+                      "Random\n154.4ms\n(paling berat)"]
+    threads = [1, 2, 4, 8]
+    colors  = ["#1565C0", "#1976D2", "#42A5F5", "#90CAF9"]
+
+    x     = np.arange(len(dataset_order))
+    width = 0.2
+
+    for i, t in enumerate(threads):
+        if t == 1:
+            # T=1 ambil dari merge_sort_par thread=1
+            times = []
+            for ds in dataset_order:
+                val = df[(df["algorithm"]=="merge_sort_par") &
+                         (df["dataset_type"]==ds) &
+                         (df["thread_count"]==1) &
+                         (df["cutoff_threshold"]==1024)]["execution_time"].mean()
+                times.append(val if not np.isnan(val) else 0)
+        else:
+            times = []
+            for ds in dataset_order:
+                val = df[(df["algorithm"]=="merge_sort_par") &
+                         (df["dataset_type"]==ds) &
+                         (df["thread_count"]==t) &
+                         (df["cutoff_threshold"]==1024)]["execution_time"].mean()
+                times.append(val if not np.isnan(val) else 0)
+
+        offset = (i - 1.5) * width
+        ax.bar(x + offset, times, width, label=f"T={t} thread",
+               color=colors[i], alpha=0.85, edgecolor="white")
+
+    # Tambah sequential baseline
+    seq_times = []
+    for ds in dataset_order:
+        val = df[(df["algorithm"]=="merge_sort_seq") &
+                 (df["dataset_type"]==ds)]["execution_time"].mean()
+        seq_times.append(val if not np.isnan(val) else 0)
+
+    ax.plot(x, seq_times, "ro-", linewidth=2, markersize=8,
+            label="Sequential baseline", zorder=5)
+
+    ax.set_xlabel("Dataset (diurutkan dari waktu sequential terkecil ke terbesar — sumber: results.csv)", fontsize=10)
+    ax.set_ylabel("Execution Time (ms)", fontsize=11)
+    ax.set_title("Grafik Waktu Eksekusi vs Karakteristik Dataset\n"
+                 "Merge Sort Paralel — N=1.000.000 elemen | Diurutkan berdasarkan T_seq", 
+                 fontsize=12, fontweight="bold")
+    ax.set_xticks(x)
+    ax.set_xticklabels(dataset_labels, fontsize=9)
+    ax.legend(fontsize=9, loc="upper right")
+    ax.grid(axis="y", alpha=0.3)
+    ax.set_ylim(bottom=0)
+
+    # Anotasi penurunan waktu
+    ax.annotate("Semakin banyak thread\nsemakin pendek batang",
+                xy=(3, 48), xytext=(2.0, 100),
+                arrowprops=dict(arrowstyle="->", color="navy"),
+                fontsize=9, color="navy")
+    ax.annotate("Urutan berdasarkan\nwaktu sequential\ndari results.csv",
+                xy=(0, 30), xytext=(0.3, 110),
+                arrowprops=dict(arrowstyle="->", color="gray"),
+                fontsize=8, color="gray")
+
 # ─────────────────────────────────────────────────────────────
 # Main
 # ─────────────────────────────────────────────────────────────
@@ -280,8 +366,16 @@ def main():
     fig4.savefig(f"{OUTPUT_DIR}/plot_dataset_comparison.png", bbox_inches="tight")
     print(f"[SAVED] {OUTPUT_DIR}/plot_dataset_comparison.png")
 
+    # ── Figure 5: Waktu vs Karakteristik Dataset ────────────
+    fig5, ax5 = plt.subplots(figsize=(12, 6))
+    plot_time_vs_dataset_char(df, ax5)
+    plt.tight_layout()
+    fig5.savefig(f"{OUTPUT_DIR}/plot_time_vs_dataset.png", bbox_inches="tight")
+    print(f"[SAVED] {OUTPUT_DIR}/plot_time_vs_dataset.png")
+
     print("\n[DONE] Semua grafik tersimpan di folder results/")
     plt.show()
 
 if __name__ == "__main__":
     main()
+
