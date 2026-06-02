@@ -89,3 +89,4 @@ void DatasetGenerator::removePadding(std::vector<int>& data, int originalSize) {
         data.resize(originalSize);
     }
 }
+
