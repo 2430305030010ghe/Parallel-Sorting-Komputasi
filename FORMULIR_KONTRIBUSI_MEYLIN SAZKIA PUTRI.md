@@ -1,8 +1,6 @@
 # FORMULIR EVALUASI KONTRIBUSI — MEYLIN
 **Peran:** Sistem Arsitek
 **Proyek:** Analisis Speedup Sorting Paralel: Merge Sort & Bitonic Sort (OpenMP)
-**Semester:** Genap 2024/2025
-**Tanggal:** Juni 2025
 
 ---
 
