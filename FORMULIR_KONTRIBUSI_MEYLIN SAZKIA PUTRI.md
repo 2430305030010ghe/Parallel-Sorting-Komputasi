@@ -111,6 +111,3 @@ overhead inisialisasi atau faktor eksternal seperti proses background Windows.
 Solusi: menggunakan 5 repetisi dengan filter outlier ±2σ dan seed RNG yang fixed
 sehingga hasil reproducible dan konsisten.
 ```
-
----
-*Formulir diisi oleh: Meylin*
